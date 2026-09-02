@@ -1,0 +1,12 @@
+# Ignore environment and sensitive configuration
+env/
+.env
+*.env
+admin details.txt
+
+# OS and IDE temporary files
+.DS_Store
+Thumbs.db
+.claude/
+.vscode/
+.idea/
