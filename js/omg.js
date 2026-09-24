@@ -356,10 +356,12 @@ const portfolioItems = [
 
   // ===== SHARE =====
   function shareItem(id) {
-    const item = portfolioItems.find(i => i.id === id);
-    if (!item) return;
+    // Compare as strings: static items carry a numeric `id` while ids passed
+    // in from project.php are always strings, so a strict === would miss.
+    const item = portfolioItems.find(i => String(i.id) === String(id));
+    const title = item ? item.title : document.title;
     if (navigator.share) {
-      navigator.share({ title: item.title, text: 'Check out this design by OMG Graphics', url: window.location.href });
+      navigator.share({ title: title, text: 'Check out this design by OMG Graphics', url: window.location.href });
     } else {
       navigator.clipboard.writeText(window.location.href).then(() => alert('Link copied!'));
     }
