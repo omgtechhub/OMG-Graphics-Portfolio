@@ -18,6 +18,7 @@ $out = array_map(function($p) {
         'category'   => $p['category']   ?? '',
         'type'       => $p['type']       ?? '',
         'image'      => $p['image']      ?? '',
+        'images'     => project_images($p),
         'client'     => $p['client']     ?? '',
         'year'       => $p['year']       ?? null,
         'brief'      => $p['brief']      ?? '',

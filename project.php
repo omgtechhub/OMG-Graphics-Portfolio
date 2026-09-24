@@ -21,6 +21,8 @@ if (!$project) {
 }
 
 $categoryLabel = PORTFOLIO_CATEGORIES[$project['category']] ?? ucfirst($project['category']);
+$projectImages = project_images($project);
+if (!$projectImages) $projectImages = [$project['image']];
 
 // Related projects: same category, excluding this one, from the combined pool.
 $pool = array_merge(portfolio_static_all(), portfolio_all(true));
@@ -121,13 +123,31 @@ $pageDesc  = htmlspecialchars(mb_strimwidth($project['brief'] ?? $project['title
     </section>
 
     <!-- MEDIA + ACTIONS -->
+    <?php
+      $imageCount   = count($projectImages);
+      $downloadExt  = strtolower(pathinfo($projectImages[0], PATHINFO_EXTENSION)) ?: 'jpg';
+    ?>
     <section style="padding:20px 5vw 60px;">
       <div style="max-width:900px;margin:0 auto;">
-        <div style="border-radius:16px;overflow:hidden;border:1px solid var(--border);margin-bottom:24px;background:var(--surface);">
-          <img src="<?php echo htmlspecialchars($project['image']); ?>" alt="<?php echo htmlspecialchars($project['title']); ?>" style="width:100%;height:auto;display:block;">
+        <div class="project-media-frame" id="projectMedia" data-images='<?php echo htmlspecialchars(json_encode(array_values($projectImages)), ENT_QUOTES); ?>'>
+          <?php if ($imageCount > 1): ?>
+          <button type="button" class="carousel-nav carousel-prev" onclick="projectCarouselNav(-1)" aria-label="Previous image"><i class="fa-solid fa-chevron-left"></i></button>
+          <?php endif; ?>
+
+          <img id="projectMediaImg" src="<?php echo htmlspecialchars($projectImages[0]); ?>" alt="<?php echo htmlspecialchars($project['title']); ?>">
+
+          <?php if ($imageCount > 1): ?>
+          <button type="button" class="carousel-nav carousel-next" onclick="projectCarouselNav(1)" aria-label="Next image"><i class="fa-solid fa-chevron-right"></i></button>
+          <div class="carousel-counter" id="projectMediaCounter">1 / <?php echo $imageCount; ?></div>
+          <div class="carousel-dots" id="projectMediaDots">
+            <?php foreach ($projectImages as $i => $img): ?>
+            <button type="button" class="carousel-dot<?php echo $i === 0 ? ' active' : ''; ?>" onclick="projectCarouselGo(<?php echo $i; ?>)" aria-label="Go to image <?php echo $i + 1; ?>"></button>
+            <?php endforeach; ?>
+          </div>
+          <?php endif; ?>
         </div>
         <div class="modal-actions" style="margin-top:0;">
-          <a href="<?php echo htmlspecialchars($project['image']); ?>" download="<?php echo htmlspecialchars($project['title']); ?>.jpg" class="btn-primary">
+          <a id="projectDownloadBtn" href="<?php echo htmlspecialchars($projectImages[0]); ?>" download="<?php echo htmlspecialchars($project['title']); ?>.<?php echo htmlspecialchars($downloadExt); ?>" class="btn-primary">
             <i class="fa-solid fa-download"></i> Download Design
           </a>
           <button onclick="shareItem('<?php echo htmlspecialchars($project['id'] ?? $project['slug']); ?>')" class="btn-outline">
@@ -136,6 +156,45 @@ $pageDesc  = htmlspecialchars(mb_strimwidth($project['brief'] ?? $project['title
         </div>
       </div>
     </section>
+
+    <?php if ($imageCount > 1): ?>
+    <script>
+    (function() {
+      var frame = document.getElementById('projectMedia');
+      var images = JSON.parse(frame.getAttribute('data-images') || '[]');
+      var idx = 0;
+      var imgEl = document.getElementById('projectMediaImg');
+      var counterEl = document.getElementById('projectMediaCounter');
+      var dots = frame.querySelectorAll('.carousel-dot');
+      var downloadBtn = document.getElementById('projectDownloadBtn');
+      var title = <?php echo json_encode($project['title']); ?>;
+
+      function render() {
+        imgEl.classList.add('fading');
+        setTimeout(function() {
+          imgEl.src = images[idx];
+          dots.forEach(function(d, i) { d.classList.toggle('active', i === idx); });
+          if (counterEl) counterEl.textContent = (idx + 1) + ' / ' + images.length;
+          if (downloadBtn) {
+            var ext = (images[idx].split('.').pop() || 'jpg').toLowerCase();
+            downloadBtn.setAttribute('href', images[idx]);
+            downloadBtn.setAttribute('download', title + '.' + ext);
+          }
+          imgEl.classList.remove('fading');
+        }, 150);
+      }
+
+      window.projectCarouselNav = function(dir) {
+        idx = (idx + dir + images.length) % images.length;
+        render();
+      };
+      window.projectCarouselGo = function(i) {
+        idx = i;
+        render();
+      };
+    })();
+    </script>
+    <?php endif; ?>
 
     <!-- WRITE-UP -->
     <section style="padding:20px 5vw 80px;">

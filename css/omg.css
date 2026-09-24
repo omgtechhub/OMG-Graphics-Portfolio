@@ -707,6 +707,54 @@
     .process-step p { font-size: 0.9rem; color: var(--text2); line-height: 1.7; }
     .modal-actions { display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
 
+    /* ===== PROJECT MEDIA FRAME (project.php) =====
+       No fixed aspect-ratio is set here on purpose: the frame simply hugs
+       whatever image is inside it via object-fit: contain, so a square
+       design gets a square frame and a tall/wide design gets a tall/wide
+       frame — each project's own dimensions decide the shape. */
+    .project-media-frame {
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; margin-bottom: 24px;
+      padding: clamp(10px, 3vw, 28px);
+    }
+    .project-media-frame img {
+      display: block; width: auto; height: auto;
+      max-width: 100%; max-height: 74vh;
+      border-radius: 8px; object-fit: contain;
+      transition: opacity 0.2s ease;
+    }
+    .project-media-frame img.fading { opacity: 0; }
+    .carousel-nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(0,0,0,0.55); color: #fff; border: none;
+      display: flex; align-items: center; justify-content: center;
+      cursor: none; z-index: 5; backdrop-filter: blur(4px);
+      transition: background 0.2s, transform 0.2s;
+    }
+    .carousel-nav:hover { background: var(--red); transform: translateY(-50%) scale(1.08); }
+    .carousel-prev { left: 14px; }
+    .carousel-next { right: 14px; }
+    .carousel-counter {
+      position: absolute; top: 14px; right: 14px;
+      background: rgba(0,0,0,0.55); color: #fff;
+      font-family: 'Space Mono', monospace; font-size: 0.68rem;
+      padding: 4px 10px; border-radius: 100px; z-index: 5;
+    }
+    .carousel-dots {
+      position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 8px; z-index: 5;
+    }
+    .carousel-dot {
+      width: 8px; height: 8px; border-radius: 50%; padding: 0;
+      background: rgba(255,255,255,0.5); border: none; cursor: none;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .carousel-dot:hover { background: rgba(255,255,255,0.8); }
+    .carousel-dot.active { background: #fff; transform: scale(1.3); }
+
     /* ===== TESTIMONIALS ===== */
     .testimonials-grid {
       display: grid;

@@ -84,6 +84,15 @@ function portfolio_save(array $project): bool {
     return omg_write_json(PORTFOLIO_FILE, $data);
 }
 
+// Returns every image for a project (uploaded projects can have several;
+// the 28 static pieces and older uploads only ever had one `image`).
+function project_images(array $p): array {
+    if (!empty($p['images']) && is_array($p['images'])) {
+        return array_values(array_filter($p['images']));
+    }
+    return !empty($p['image']) ? [$p['image']] : [];
+}
+
 function portfolio_delete(string $id): bool {
     $data             = omg_read_json(PORTFOLIO_FILE);
     $data['projects'] = array_values(
